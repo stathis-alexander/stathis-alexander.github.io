@@ -7,7 +7,7 @@ Engineers have a bad habit of abbreviating things. I guess it comes from some de
 
 I prefer using fully qualified names for variables, methods, and classes.
 
-Imagine you have an `Abbreviation` class. It's tempting to intantiate and store it in a number of variable names:
+Imagine you have an `Abbreviation` class. It's tempting to instantiate and store it in a number of variable names:
 ```ts
 const a = new Abbreviation();
 const abbr = new Abbreviation();

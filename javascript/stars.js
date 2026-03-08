@@ -9,7 +9,7 @@ function resize() {
 window.addEventListener('resize', resize);
 resize();
 
-const stars = Array.from({ length: 1000 }, () => ({
+const stars = Array.from({ length: Math.min(1000, canvas.width * 0.50) }, () => ({
   x: Math.random(),
   y: Math.random(),
   alpha: Math.random(),

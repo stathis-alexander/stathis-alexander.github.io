@@ -1,4 +1,5 @@
-body {
+html {
+  background-color: #000113;
   overflow: hidden;
   height: 400px;
   background-repeat: repeat;
