@@ -3,9 +3,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "bun run src/build-shower-thoughts.ts",
-    "build:shower-thoughts": "bun run src/build-shower-thoughts.ts",
-    "dev": "bun run src/serve.ts"
+    "compile": "bun run src/build-shower-thoughts.ts",
+    "dev": "bun run src/serve.ts",
+    "build": "bun build --production --outdir ./build ./index.html ./shower-thoughts/*.html"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
