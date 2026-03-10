@@ -1,0 +1,20 @@
+# The Art of Programming: Less is More
+
+In the 70's, a common problem in the relatively tiny unix terminals of the time was viewing long content that didnt fit on a single screen. This persisted until the late 70's when someone wrote `more`, a pager utilitly that allowed for breaking content up into pages and navigating through them. Unfortunately, `more` only allowed paging forwards: if the user paged too far they had to exit and start over. So sometime in the mid 80's someone built a new pager that could navigate both forwards and backwards. This new pager they called `less` because `less` is `mpre` (with more). Anyways, not completely relevant to what I want to discuss here, but I've always thought that was cute. 
+
+I recall being in undergrad at Santa Cruz studying computer science when another student asked me how one of my programming projects was going. I don't recall what I said, but I inquired about theirs and they were excited to show me. They'd somehow managed to write thousands of lines of code for what had only taken me a couple or few hundred. Not only was there just a lot more code than necessary, but the whole thing was organized like shit: functions calling functions all over the place.  I remember being astounded and confused by this: how could this relatively smart person who I knew did well in these classes write so much useless code?
+
+When you're young, the goal of programming seems obviously to be to write lines of code. As you get older, it starts to look a lot more like writing _the right_ lines of code, and maybe importantly, _not writing_ the _wrong_ lines. You learn that extra code comes with a cost. Every extra line you write is another line that can be buggy. Every extra line you write is another line you have to maintain. Every extra line you write is a line someone (possibly yourself) has to decipher months or years from now. With maturity comes the understanding that the art of programming is less is more: finding the minimum set of readable lines of code that solve the task.You learn that there's an elegance and a practical benefit to saying what you mean concisely. While I dont think Ive ever discussed explicitly, all good coders Ive worked with have this understanding (_"She wrotes *clean* code."_). 
+
+In the age of AI, Claude makes it easy to just generate hundreds and thousands of lines of code. Every function comes with a one line comment telling you what it does, and every new feature Claude implements comes with a `README.md` containing 500 words on what it does. All of this means that its easier than ever to just write more lines. 
+
+```ts
+// add five to a number
+const addFive = (input: number) => input + 5;
+```
+
+Eningeers and non-engineers alike are churning out code. Everyone seems so amazed by Claude - and it truly is amazing - they've forgotten (or, in the case of non-engineers, maybe never learned) that there's value in what's _not written_. I'm not here to bash Claude, but somehow in the midst of all of the amazement, and with the ease in which Claude can just produce more, new, faster, it feels like we've culturally lost sight of this fact. Maybe this is what the twitter-sphere is calling _taste_, I'm not sure. 
+
+These days, deleting lines of code brings more joy than adding them. Every deleted line can't break. Every deleted line doesnt need to be maintainted. Every deleted line adds clarity.
+
+
