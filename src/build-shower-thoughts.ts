@@ -20,6 +20,8 @@ type ParsedFile = {
   date: dayjs.Dayjs;
 };
 
+type Entry = ParsedFile & ({ filename: string } | { content: string });
+
 function getTemplate(): string {
   if (!existsSync(TEMPLATE_PATH)) {
     throw new Error(`Template not found: ${TEMPLATE_PATH}`);
@@ -39,7 +41,7 @@ function fillTemplate(
     .replace(/\{\{CONTENT\}\}/g, content);
 }
 
-function parseFilename(filename: string): (ParsedFile & { filename: string }) | null {
+function parseFilename(filename: string): Entry | null {
   const match = filename.match(FILENAME_PATTERN);
   if (!match) return null;
 
@@ -63,49 +65,9 @@ function capitalize(s: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
-async function build(): Promise<void> {
-  if (!existsSync(ROOT)) {
-    mkdirSync(ROOT, { recursive: true });
-    console.log("Created shower-thoughts/ — add .md files and run again.");
-    return;
-  }
-
-  const template = getTemplate();
-  const files = readdirSync(SOURCE_ROOT).filter(
-    (f: string) => f.endsWith(".md") && !f.startsWith("_")
-  );
-
-  const entries: (ParsedFile & { filename: string })[] = [];
-  for (const file of files) {
-    const parsed = parseFilename(file);
-    if (!parsed) {
-      console.warn(`Skipping ${file} (expected YYYY-mm-dd-slug.md)`);
-      continue;
-    }
-
-    if (parsed.date.isBefore(dayjs())) {
-      entries.push(parsed);
-    }
-  }
-
-  for (const { slug, filename, formattedDate } of entries) {
-    const mdPath = join(SOURCE_ROOT, filename);
-    const md = readFileSync(mdPath, "utf-8");
-    const bodyHtml = await marked.parse(md);
-    const content = `<article class="essay">${bodyHtml}</article>`;
-    const html = fillTemplate(
-      template,
-      slugToTitle(slug),
-      formattedDate,
-      content
-    );
-    const outPath = join(ROOT, `${slug}.html`);
-    writeFileSync(outPath, html, "utf-8");
-    console.log(`Built: ${filename} → ${slug}.html`);
-  }
-
+function buildIndex(entries: Entry[]): Entry {
   // Group by year, newest first; entries within year sorted by date (newest first)
-  const byYear = new Map<string, (ParsedFile & { filename: string })[]>();
+  const byYear = new Map<string, Entry[]>();
   for (const e of entries) {
     const key = e.date.format(YEAR_FORMAT);
     if (!byYear.has(key)) byYear.set(key, []);
@@ -118,23 +80,77 @@ async function build(): Promise<void> {
     (a, b) => parseInt(b[0], 10) - parseInt(a[0], 10)
   );
 
-  const indexSections = sortedYears
-    .map(([year, items]) => {
-      const listItems = items
-        .map(
-          (e) =>
-            `<li><span class="list-date">${htmlEscape(e.formattedDate)}</span> · <a href="${htmlEscape(e.slug)}.html">${htmlEscape(capitalize(slugToTitle(e.slug)))}</a></li>`
-        )
-        .join("");
-      return `<section><h2 class="index-year">${htmlEscape(year)}</h2><ul class="list">${listItems}</ul></section>`;
-    })
-    .join("\n");
+  let markdownLines: string[] = [
+    '# Shower thoughts',
+    'A collection of unfiltered, irrelevant, and unpolished thoughts.',
+  ];
 
-  const indexContent = `<h1 class="index-title">Shower thoughts</h1>\n${indexSections}`;
-  let indexHtml = fillTemplate(template, "Shower thoughts", "", indexContent);
-  indexHtml = indexHtml.replace(/<p class="subtitle"><\/p>\n?/, "");
-  writeFileSync(join(ROOT, "index.html"), indexHtml, "utf-8");
-  console.log("Built: index.html");
+  sortedYears
+    .flatMap(([year, items]) => {
+      markdownLines.push(`## ${htmlEscape(year)}`);
+      items.forEach((e) => {
+        markdownLines.push(`* ${e.formattedDate} · [${capitalize(slugToTitle(e.slug))}](${htmlEscape(e.slug)})`);
+      });
+    })
+
+  const date = dayjs();
+  return {
+    slug: "index",
+    formattedDate: date.format(DATE_FORMAT),
+    date: date,
+    content: markdownLines.join("\n"),
+  };
+}
+
+async function build(): Promise<void> {
+  if (!existsSync(ROOT)) {
+    mkdirSync(ROOT, { recursive: true });
+    console.log("Created shower-thoughts/ — add .md files and run again.");
+    return;
+  }
+
+  const template = getTemplate();
+  const files = readdirSync(SOURCE_ROOT).filter(
+    (f: string) => f.endsWith(".md") && !f.startsWith("_")
+  );
+
+  const entries: Entry[] = [];
+  for (const file of files) {
+    const parsed = parseFilename(file);
+    if (!parsed) {
+      console.warn(`Skipping ${file} (expected YYYY-mm-dd-slug.md)`);
+      continue;
+    }
+
+    if (parsed.date.isBefore(dayjs())) {
+      entries.push(parsed);
+    }
+  }
+
+  const index = await buildIndex(entries);
+  entries.push(index);
+
+  for (const entry of entries) {
+    let markdownContent: string;
+    if ('filename' in entry) {
+      const mdPath = join(SOURCE_ROOT, entry.filename);
+      markdownContent = readFileSync(mdPath, "utf-8");
+    } else {
+      markdownContent = entry.content;
+    }
+
+    const bodyHtml = await marked.parse(markdownContent);
+    const content = `<article class="essay">${bodyHtml}</article>`;
+    const html = fillTemplate(
+      template,
+      slugToTitle(entry.slug),
+      entry.formattedDate,
+      content
+    );
+    const outPath = join(ROOT, `${entry.slug}.html`);
+    writeFileSync(outPath, html, "utf-8");
+    console.log(`Built: ${entry.slug}.html`);
+  }
 }
 
 build().catch((err) => {
