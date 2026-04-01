@@ -3,15 +3,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "compile": "bun run src/build-shower-thoughts.ts",
     "dev": "bun run src/serve.ts",
-    "build": "bun build --production --outdir ./build ./index.html ./shower-thoughts/*.html"
+    "build": "bun build --production --outdir ./build ./index.html"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
-    "bun-types": "latest",
-    "dayjs": "^1.11.0",
-    "escape-goat": "^4.0.0",
-    "marked": "^15.0.0"
+    "bun-types": "latest"
   }
 }

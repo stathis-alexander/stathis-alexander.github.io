@@ -1,7 +1,3 @@
-/**
- * Static dev server. Serves the repo root so / and /shower-thoughts/ work.
- * Port: random in 9000–9999.
- */
 import { join, resolve, dirname } from "path";
 import { fileURLToPath } from "url";
 
