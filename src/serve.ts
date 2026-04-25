@@ -3,7 +3,7 @@ import { fileURLToPath } from "url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
-const PORT = 9000;
+const PORT = 9010;
 
 const server = Bun.serve({
   port: PORT,

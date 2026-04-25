@@ -10,7 +10,7 @@ Manages tools with `asdf`.
 asdf install
 ```
 
-Uses `bun`. Hosts at `localhost:9000`.
+Uses `bun`. Hosts at `localhost:9010`.
 
 ```bash
 bun run dev
